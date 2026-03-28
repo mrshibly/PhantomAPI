@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+venv/
+.venv/
+.env
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+playwright-report/

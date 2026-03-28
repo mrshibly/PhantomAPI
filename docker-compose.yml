@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  phantom-api:
+    build: .
+    container_name: phantom-api
+    ports:
+      - "7777:7777"
+    environment:
+      - API_SECRET_KEY=${API_SECRET_KEY:-change-me-to-a-strong-secret}
+      - HEADLESS=true
+    restart: unless-stopped

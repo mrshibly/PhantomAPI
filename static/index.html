@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhantomAPI | Chat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0b0f;
+            --surface: #12141a;
+            --surface2: #1a1d26;
+            --accent: #7c4dff;
+            --accent-glow: rgba(124, 77, 255, 0.3);
+            --text: #e4e4e7;
+            --text-muted: #71717a;
+            --border: rgba(255, 255, 255, 0.08);
+            --user-bg: linear-gradient(135deg, #2a1f5e, #1e1b4b);
+            --ai-bg: #16181f;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* ---- Sidebar ---- */
+        .sidebar {
+            width: 280px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 28px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent), #a78bfa);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .brand h1 {
+            font-size: 18px;
+            font-weight: 600;
+            background: linear-gradient(to right, #fff, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: rgba(74, 222, 128, 0.08);
+            border: 1px solid rgba(74, 222, 128, 0.2);
+            border-radius: 20px;
+            font-size: 12px;
+            color: #4ade80;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            background: #4ade80;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #4ade80;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .config { display: flex; flex-direction: column; gap: 14px; }
+
+        .config label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+
+        .config input, .config select {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .config input:focus, .config select:focus {
+            border-color: var(--accent);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            font-size: 11px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .sidebar-footer a { color: var(--accent); text-decoration: none; }
+
+        /* ---- Chat Area ---- */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 16px 32px;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        #messages {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .msg {
+            max-width: 75%;
+            margin-bottom: 20px;
+            padding: 14px 18px;
+            border-radius: 14px;
+            line-height: 1.65;
+            font-size: 14px;
+            animation: slideIn 0.25s ease-out;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .msg.user {
+            background: var(--user-bg);
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+
+        .msg.ai {
+            background: var(--ai-bg);
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 4px;
+        }
+
+        .msg.thinking {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* ---- Input ---- */
+        .input-area {
+            padding: 20px 32px 28px;
+        }
+
+        .input-box {
+            display: flex;
+            gap: 10px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 14px;
+            transition: border-color 0.2s;
+        }
+
+        .input-box:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .input-box textarea {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            resize: none;
+            outline: none;
+            height: 24px;
+            max-height: 160px;
+            line-height: 24px;
+        }
+
+        .send-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 13px;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+
+        .send-btn:hover:not(:disabled) {
+            filter: brightness(1.15);
+            box-shadow: 0 0 16px var(--accent-glow);
+        }
+
+        .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">👻</div>
+            <h1>PhantomAPI</h1>
+        </div>
+        <div class="status">
+            <div class="status-dot"></div>
+            Engine Online
+        </div>
+        <div class="config">
+            <label>API Key</label>
+            <input type="password" id="key" value="change-me-to-a-strong-secret">
+            <label>Model</label>
+            <select id="model">
+                <option value="gpt-4o-mini">gpt-4o-mini</option>
+                <option value="gpt-4o">gpt-4o</option>
+            </select>
+        </div>
+        <div class="sidebar-footer">
+            Built by <a href="https://github.com/mrshibly" target="_blank">mrshibly</a>
+        </div>
+    </div>
+
+    <div class="chat-area">
+        <div class="chat-header">PhantomAPI v1.0.0 — Free ChatGPT Proxy for n8n</div>
+        <div id="messages">
+            <div class="msg ai">👻 Hello! I'm PhantomAPI. Ask me anything.</div>
+        </div>
+        <div class="input-area">
+            <div class="input-box">
+                <textarea id="input" placeholder="Ask PhantomAPI..." rows="1"></textarea>
+                <button class="send-btn" id="send">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const msgs = document.getElementById('messages');
+        const input = document.getElementById('input');
+        const sendBtn = document.getElementById('send');
+        const keyInput = document.getElementById('key');
+        const modelSel = document.getElementById('model');
+
+        function addMsg(role, text) {
+            const d = document.createElement('div');
+            d.className = `msg ${role}`;
+            d.textContent = text;
+            msgs.appendChild(d);
+            msgs.scrollTop = msgs.scrollHeight;
+            return d;
+        }
+
+        async function send() {
+            const text = input.value.trim();
+            if (!text || sendBtn.disabled) return;
+
+            addMsg('user', text);
+            input.value = '';
+            input.style.height = '24px';
+            sendBtn.disabled = true;
+
+            const thinking = addMsg('ai', '👻 Thinking...');
+            thinking.classList.add('thinking');
+
+            try {
+                const res = await fetch('/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${keyInput.value}`
+                    },
+                    body: JSON.stringify({
+                        messages: [{ role: 'user', content: text }],
+                        model: modelSel.value
+                    })
+                });
+                const data = await res.json();
+                msgs.removeChild(thinking);
+
+                if (data.choices && data.choices[0]?.message) {
+                    addMsg('ai', data.choices[0].message.content);
+                } else if (data.detail) {
+                    addMsg('ai', '❌ ' + data.detail);
+                } else {
+                    addMsg('ai', '❌ ' + JSON.stringify(data));
+                }
+            } catch (e) {
+                msgs.removeChild(thinking);
+                addMsg('ai', '❌ Connection failed: ' + e.message);
+            } finally {
+                sendBtn.disabled = false;
+                input.focus();
+            }
+        }
+
+        sendBtn.addEventListener('click', send);
+        input.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+        });
+        input.addEventListener('input', () => {
+            input.style.height = 'auto';
+            input.style.height = input.scrollHeight + 'px';
+        });
+    </script>
+</body>
+</html>
