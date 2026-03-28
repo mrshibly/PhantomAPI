@@ -15,6 +15,10 @@
 
 </div>
 
+<div align="center">
+  <video src="demo.mp4" width="800" controls muted autoplay loop></video>
+</div>
+
 ---
 
 ## 🌟 What is PhantomAPI?
