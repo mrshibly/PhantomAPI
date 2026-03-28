@@ -104,6 +104,10 @@ The server will start on `http://localhost:7777`.
 
 ## 🔌 Connecting to n8n
 
+<div align="center">
+  <img src="n8n_preview.png" width="800" alt="n8n Workflow Example">
+</div>
+
 ### Method 1: OpenAI Node (Recommended)
 
 1. In n8n, go to **Credentials → New → OpenAI API**
