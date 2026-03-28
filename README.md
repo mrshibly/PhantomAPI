@@ -56,6 +56,14 @@
 
 ---
 
+## 🎨 Preview
+
+<div align="center">
+  <img src="gui_screenshot.png" width="800" alt="PhantomAPI GUI Screenshot">
+</div>
+
+---
+
 ## 🛠️ Quick Start
 
 ### Prerequisites
